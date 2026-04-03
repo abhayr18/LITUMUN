@@ -2,14 +2,24 @@ import { NextResponse } from "next/server";
 import Razorpay from "razorpay";
 import { query } from "@/lib/db";
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
-});
 
 export async function POST(request) {
   try {
     const { registrationId, amount } = await request.json();
+
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+      console.warn("Razorpay keys are missing from environment variables.");
+    }
+    
+    let razorpay;
+    try {
+      razorpay = new Razorpay({
+        key_id: process.env.RAZORPAY_KEY_ID || "dummy_key",
+        key_secret: process.env.RAZORPAY_KEY_SECRET || "dummy_secret",
+      });
+    } catch (err) {
+      console.error("Failed to initialize Razorpay:", err);
+    }
 
     if (!registrationId || !amount) {
       return NextResponse.json(
