@@ -14,33 +14,33 @@ export default function EventsPage() {
     : EVENTS.filter((e) => e.category === activeCategory);
 
   return (
-    <div className="pt-20">
+    <div className="pt-24 bg-transparent pb-20">
       {/* Hero */}
-      <section className="relative py-16 sm:py-24 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(139,92,246,0.1),transparent_60%)]" />
+      <section className="relative py-16 sm:py-24 overflow-hidden bg-transparent">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(184,151,90,0.05),transparent_60%)]" />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading
-            badge="Events"
-            title="Explore Our Events"
-            description="From intense MUN committee sessions to cultural celebrations — find your stage at LITUMUN 2026."
+            badge="Events & Councils"
+            title="Explore Our Committees"
+            description="From intense international MUN committee sessions to historic assemblies and press corps, find your forum at LITUMUN 2026."
           />
 
           {/* Category Filters */}
-          <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 mb-12">
+          <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 mb-12">
             {CATEGORIES.map((cat) => (
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
-                className={`relative px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                className={`relative px-5 py-2.5 rounded-xl text-xs font-poppins-clean font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer ${
                   activeCategory === cat.id
-                    ? "text-white"
-                    : "text-gray-400 hover:text-white bg-white/5 hover:bg-white/10"
+                    ? "text-black font-bold"
+                    : "text-[#fbf9f4]/70 hover:text-[#b8975a] bg-[#1c0e07]/40 border border-[#b8975a]/15 hover:border-[#b8975a]/30"
                 }`}
               >
                 {activeCategory === cat.id && (
                   <motion.div
                     layoutId="activeCategory"
-                    className="absolute inset-0 bg-gradient-to-r from-violet-600 to-blue-600 rounded-xl"
+                    className="absolute inset-0 bg-[#b8975a] rounded-xl"
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
                 )}
@@ -67,7 +67,7 @@ export default function EventsPage() {
 
           {filteredEvents.length === 0 && (
             <div className="text-center py-16">
-              <p className="text-gray-500 text-lg">No events in this category yet.</p>
+              <p className="text-[#fbf9f4]/60 text-lg font-poppins-clean font-light">No committees listed under this category yet.</p>
             </div>
           )}
         </div>

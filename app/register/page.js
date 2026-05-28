@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import SectionHeading from "@/components/SectionHeading";
@@ -10,7 +10,7 @@ import { formatCurrency } from "@/lib/utils";
 
 const STEPS = ["details", "payment", "success"];
 
-export default function RegisterPage() {
+function RegistrationFormContent() {
   const searchParams = useSearchParams();
   const preselectedEvent = searchParams.get("event");
 
@@ -158,7 +158,7 @@ export default function RegisterPage() {
         contact: form.phone,
       },
       theme: {
-        color: "#7c3aed",
+        color: "#D4AF37",
       },
     };
 
@@ -194,244 +194,263 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="pt-20">
+    <div>
+      {/* Progress */}
+      <div className="flex items-center justify-center mb-10">
+        {STEPS.map((s, i) => (
+          <div key={s} className="flex items-center">
+            <div
+              className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all border ${
+                STEPS.indexOf(step) >= i
+                  ? "bg-[#b8975a] border-[#b8975a] text-black font-bold"
+                  : "bg-[#1c0e07]/60 border-[#b8975a]/15 text-[#fbf9f4]/45"
+              }`}
+            >
+              {STEPS.indexOf(step) > i ? "✓" : i + 1}
+            </div>
+            {i < STEPS.length - 1 && (
+              <div className={`w-16 sm:w-24 h-0.5 mx-2 transition-all ${
+                STEPS.indexOf(step) > i ? "bg-[#b8975a]" : "bg-[#b8975a]/15"
+              }`} />
+            )}
+          </div>
+        ))}
+      </div>
+
+      <AnimatePresence mode="wait">
+        {/* DETAILS FORM */}
+        {step === "details" && (
+          <motion.form
+            key="details"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            onSubmit={handleSubmit}
+            className="space-y-6"
+          >
+            <div className="luxury-card rounded-3xl p-6 sm:p-8 space-y-5 shadow-lg">
+              <h3 className="text-lg font-serif-luxury font-bold text-[#fbf9f4] mb-2 border-b border-[#b8975a]/15 pb-3">Personal Details</h3>
+
+              {/* Name */}
+              <div>
+                <label className="block text-xs font-poppins-clean font-bold uppercase tracking-widest text-[#fbf9f4]/70 mb-1.5">Full Name *</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  placeholder="Enter your full name"
+                  className={`w-full px-4 py-3 bg-[#1c0e07]/60 border ${fieldErrors.name ? "border-red-400" : "border-[#b8975a]/15"} rounded-xl text-[#fbf9f4] placeholder-gray-500 focus:outline-none focus:border-[#b8975a] focus:ring-1 focus:ring-[#b8975a]/30 transition-all font-poppins-clean font-light`}
+                />
+                {fieldErrors.name && <p className="text-red-400 text-xs mt-1 font-semibold">{fieldErrors.name}</p>}
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="block text-xs font-poppins-clean font-bold uppercase tracking-widest text-[#fbf9f4]/70 mb-1.5">Email Address *</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  placeholder="your@email.com"
+                  className={`w-full px-4 py-3 bg-[#1c0e07]/60 border ${fieldErrors.email ? "border-red-400" : "border-[#b8975a]/15"} rounded-xl text-[#fbf9f4] placeholder-gray-500 focus:outline-none focus:border-[#b8975a] focus:ring-1 focus:ring-[#b8975a]/30 transition-all font-poppins-clean font-light`}
+                />
+                {fieldErrors.email && <p className="text-red-500 text-xs mt-1 font-semibold">{fieldErrors.email}</p>}
+              </div>
+
+              {/* Phone */}
+              <div>
+                <label className="block text-xs font-poppins-clean font-bold uppercase tracking-widest text-[#fbf9f4]/70 mb-1.5">Phone Number *</label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={form.phone}
+                  onChange={handleChange}
+                  placeholder="10-digit mobile number"
+                  maxLength={10}
+                  className={`w-full px-4 py-3 bg-[#1c0e07]/60 border ${fieldErrors.phone ? "border-red-400" : "border-[#b8975a]/15"} rounded-xl text-[#fbf9f4] placeholder-gray-500 focus:outline-none focus:border-[#b8975a] focus:ring-1 focus:ring-[#b8975a]/30 transition-all font-poppins-clean font-light`}
+                />
+                {fieldErrors.phone && <p className="text-red-500 text-xs mt-1 font-semibold">{fieldErrors.phone}</p>}
+              </div>
+
+              {/* College */}
+              <div>
+                <label className="block text-xs font-poppins-clean font-bold uppercase tracking-widest text-[#fbf9f4]/70 mb-1.5">College / University *</label>
+                <input
+                  type="text"
+                  name="college"
+                  value={form.college}
+                  onChange={handleChange}
+                  placeholder="Your college name"
+                  className={`w-full px-4 py-3 bg-[#1c0e07]/60 border ${fieldErrors.college ? "border-red-400" : "border-[#b8975a]/15"} rounded-xl text-[#fbf9f4] placeholder-gray-500 focus:outline-none focus:border-[#b8975a] focus:ring-1 focus:ring-[#b8975a]/30 transition-all font-poppins-clean font-light`}
+                />
+                {fieldErrors.college && <p className="text-red-500 text-xs mt-1 font-semibold">{fieldErrors.college}</p>}
+              </div>
+
+              {/* Event Selection */}
+              <div>
+                <label className="block text-xs font-poppins-clean font-bold uppercase tracking-widest text-[#fbf9f4]/70 mb-1.5">Select Committee / Event *</label>
+                <div className="relative">
+                  <select
+                    name="eventId"
+                    value={form.eventId}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-3 bg-[#1c0e07]/60 border ${fieldErrors.eventId ? "border-red-400" : "border-[#b8975a]/15"} rounded-xl text-[#fbf9f4] focus:outline-none focus:border-[#b8975a] focus:ring-1 focus:ring-[#b8975a]/30 transition-all appearance-none cursor-pointer font-poppins-clean font-medium`}
+                  >
+                    <option value="" className="text-gray-500 bg-[#1c0e07]">Choose a committee</option>
+                    {EVENTS.map((evt) => (
+                      <option key={evt.id} value={evt.id} className="text-[#fbf9f4] bg-[#1c0e07]">
+                        {evt.name} — {evt.fee > 0 ? formatCurrency(evt.fee) : "Free"}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-[#b8975a]">
+                    ▼
+                  </div>
+                </div>
+                {fieldErrors.eventId && <p className="text-red-500 text-xs mt-1 font-semibold">{fieldErrors.eventId}</p>}
+              </div>
+
+              {/* Selected event summary */}
+              {selectedEvent && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className="bg-[#b8975a]/10 border border-[#b8975a]/20 rounded-xl p-4.5"
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-[#fbf9f4] font-serif-luxury font-bold text-sm">{selectedEvent.name}</p>
+                      <p className="text-[#fbf9f4]/60 text-xs font-poppins-clean font-medium mt-0.5">{selectedEvent.shortName} • {selectedEvent.difficulty}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-xl font-serif-luxury font-bold text-[#b8975a]">
+                        {selectedEvent.fee > 0 ? formatCurrency(selectedEvent.fee) : "Free"}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </div>
+
+            {/* Error */}
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-red-950/30 border border-red-500/20 rounded-xl p-4 text-red-400 text-xs font-poppins-clean font-semibold"
+              >
+                {error}
+                {registrationData && (
+                  <button
+                    type="button"
+                    onClick={retryPayment}
+                    className="ml-2 text-red-400 underline hover:text-red-300 font-bold"
+                  >
+                    Retry Payment
+                  </button>
+                )}
+              </motion.div>
+            )}
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-4 bg-[#b8975a] hover:bg-[#d5be8f] text-black hover:text-black rounded-xl text-xs font-poppins-clean font-bold uppercase tracking-widest transition-all duration-300 border border-[#b8975a]/20 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+            >
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                  Processing...
+                </span>
+              ) : selectedEvent && selectedEvent.fee > 0 ? (
+                `Proceed to Pay ${formatCurrency(selectedEvent.fee)}`
+              ) : (
+                "Complete Registration"
+              )}
+            </button>
+          </motion.form>
+        )}
+
+        {/* PAYMENT STEP */}
+        {step === "payment" && (
+          <motion.div
+            key="payment"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="text-center py-16"
+          >
+            <LoadingSpinner size="lg" text="Redirecting to gateway..." />
+            <p className="text-[#fbf9f4]/50 text-xs mt-4 font-poppins-clean">Please do not close or refresh this browser page.</p>
+          </motion.div>
+        )}
+
+        {/* SUCCESS */}
+        {step === "success" && registrationData && (
+          <motion.div
+            key="success"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center"
+          >
+            <div className="luxury-card rounded-3xl p-8 sm:p-12 shadow-lg">
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+                className="w-20 h-20 rounded-full bg-gradient-to-br from-[#b8975a] to-[#d5be8f] flex items-center justify-center mx-auto mb-6 shadow-md shadow-[#b8975a]/20 text-black"
+              >
+                <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" /></svg>
+              </motion.div>
+
+              <h2 className="text-2xl sm:text-3xl font-serif-luxury font-bold text-[#fbf9f4] mb-2 leading-tight">Registration Confirmed</h2>
+              <p className="text-[#fbf9f4]/75 font-poppins-clean font-light text-sm mb-8">Your delegate seat at LITUMUN 2026 has been allocated.</p>
+
+              <div className="bg-[#b8975a]/10 border border-[#b8975a]/20 rounded-xl p-6 mb-6">
+                <p className="text-[10px] text-[#b8975a] font-poppins-clean font-bold uppercase tracking-widest mb-1.5">Official Credentials ID</p>
+                <p className="text-2xl sm:text-3xl font-serif-luxury font-bold text-[#fbf9f4] tracking-wider">
+                  {registrationData.registrationId}
+                </p>
+              </div>
+
+              <div className="space-y-2 text-sm text-[#fbf9f4]/80 font-poppins-clean font-medium border-t border-[#b8975a]/15 pt-4 max-w-xs mx-auto">
+                <p className="flex justify-between"><span className="text-[#fbf9f4]/50">Council:</span> <span className="text-[#fbf9f4] font-semibold text-right">{registrationData.eventName}</span></p>
+                <p className="flex justify-between"><span className="text-[#fbf9f4]/50">Invoice Fee:</span> <span className="text-[#fbf9f4] font-semibold">{formatCurrency(registrationData.amount)}</span></p>
+              </div>
+
+              <p className="text-[#fbf9f4]/50 text-xs mt-8 leading-relaxed font-poppins-clean font-light max-w-sm mx-auto">
+                A receipt copy has been sent to your inbox. Please present your Credentials ID during on-campus verify checks on August 16.
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <div className="pt-24 bg-transparent pb-20">
       <section className="relative py-16 sm:py-24">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(139,92,246,0.08),transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(184,151,90,0.05),transparent_60%)]" />
         <div className="relative max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <SectionHeading
-            badge="Register"
+            badge="Delegacy Seats"
             title="Join LITUMUN 2026"
-            description="Secure your spot at Central India's premier MUN conference."
+            description="Submit details to confirm your delegate allocation at Laxminarayan Innovation Technological University's flagship MUN."
           />
 
-          {/* Progress */}
-          <div className="flex items-center justify-center mb-10">
-            {STEPS.map((s, i) => (
-              <div key={s} className="flex items-center">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                    STEPS.indexOf(step) >= i
-                      ? "bg-gradient-to-r from-violet-600 to-blue-600 text-white"
-                      : "bg-white/5 text-gray-600"
-                  }`}
-                >
-                  {STEPS.indexOf(step) > i ? "✓" : i + 1}
-                </div>
-                {i < STEPS.length - 1 && (
-                  <div className={`w-16 sm:w-24 h-0.5 mx-2 transition-all ${
-                    STEPS.indexOf(step) > i ? "bg-violet-500" : "bg-white/10"
-                  }`} />
-                )}
-              </div>
-            ))}
-          </div>
-
-          <AnimatePresence mode="wait">
-            {/* DETAILS FORM */}
-            {step === "details" && (
-              <motion.form
-                key="details"
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -30 }}
-                onSubmit={handleSubmit}
-                className="space-y-6"
-              >
-                <div className="bg-gray-900/60 border border-white/5 rounded-2xl p-6 sm:p-8 space-y-5">
-                  <h3 className="text-lg font-bold text-white mb-2">Personal Details</h3>
-
-                  {/* Name */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1.5">Full Name *</label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={form.name}
-                      onChange={handleChange}
-                      placeholder="Enter your full name"
-                      className={`w-full px-4 py-3 bg-white/5 border ${fieldErrors.name ? "border-red-500/50" : "border-white/10"} rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/50 transition-all`}
-                    />
-                    {fieldErrors.name && <p className="text-red-400 text-xs mt-1">{fieldErrors.name}</p>}
-                  </div>
-
-                  {/* Email */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1.5">Email Address *</label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={form.email}
-                      onChange={handleChange}
-                      placeholder="your@email.com"
-                      className={`w-full px-4 py-3 bg-white/5 border ${fieldErrors.email ? "border-red-500/50" : "border-white/10"} rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/50 transition-all`}
-                    />
-                    {fieldErrors.email && <p className="text-red-400 text-xs mt-1">{fieldErrors.email}</p>}
-                  </div>
-
-                  {/* Phone */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1.5">Phone Number *</label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={form.phone}
-                      onChange={handleChange}
-                      placeholder="10-digit mobile number"
-                      maxLength={10}
-                      className={`w-full px-4 py-3 bg-white/5 border ${fieldErrors.phone ? "border-red-500/50" : "border-white/10"} rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/50 transition-all`}
-                    />
-                    {fieldErrors.phone && <p className="text-red-400 text-xs mt-1">{fieldErrors.phone}</p>}
-                  </div>
-
-                  {/* College */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1.5">College / University *</label>
-                    <input
-                      type="text"
-                      name="college"
-                      value={form.college}
-                      onChange={handleChange}
-                      placeholder="Your college name"
-                      className={`w-full px-4 py-3 bg-white/5 border ${fieldErrors.college ? "border-red-500/50" : "border-white/10"} rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/50 transition-all`}
-                    />
-                    {fieldErrors.college && <p className="text-red-400 text-xs mt-1">{fieldErrors.college}</p>}
-                  </div>
-
-                  {/* Event Selection */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-1.5">Select Event *</label>
-                    <select
-                      name="eventId"
-                      value={form.eventId}
-                      onChange={handleChange}
-                      className={`w-full px-4 py-3 bg-white/5 border ${fieldErrors.eventId ? "border-red-500/50" : "border-white/10"} rounded-xl text-white focus:outline-none focus:border-violet-500 focus:ring-1 focus:ring-violet-500/50 transition-all appearance-none cursor-pointer`}
-                    >
-                      <option value="" className="bg-gray-900">Choose an event</option>
-                      {EVENTS.map((evt) => (
-                        <option key={evt.id} value={evt.id} className="bg-gray-900">
-                          {evt.name} — {evt.fee > 0 ? formatCurrency(evt.fee) : "Free"}
-                        </option>
-                      ))}
-                    </select>
-                    {fieldErrors.eventId && <p className="text-red-400 text-xs mt-1">{fieldErrors.eventId}</p>}
-                  </div>
-
-                  {/* Selected event summary */}
-                  {selectedEvent && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      className="bg-violet-500/5 border border-violet-500/10 rounded-xl p-4"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-white font-bold">{selectedEvent.name}</p>
-                          <p className="text-gray-400 text-sm">{selectedEvent.shortName} • {selectedEvent.difficulty}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-2xl font-black bg-gradient-to-r from-violet-400 to-blue-400 bg-clip-text text-transparent">
-                            {selectedEvent.fee > 0 ? formatCurrency(selectedEvent.fee) : "Free"}
-                          </p>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </div>
-
-                {/* Error */}
-                {error && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-red-500/10 border border-red-500/20 rounded-xl p-4 text-red-400 text-sm"
-                  >
-                    {error}
-                    {registrationData && (
-                      <button
-                        type="button"
-                        onClick={retryPayment}
-                        className="ml-2 text-red-300 underline hover:text-red-200"
-                      >
-                        Retry Payment
-                      </button>
-                    )}
-                  </motion.div>
-                )}
-
-                {/* Submit */}
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full py-4 bg-gradient-to-r from-violet-600 to-blue-600 rounded-xl text-base font-bold text-white shadow-2xl shadow-violet-500/20 hover:shadow-violet-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Processing...
-                    </span>
-                  ) : selectedEvent && selectedEvent.fee > 0 ? (
-                    `Proceed to Pay ${formatCurrency(selectedEvent.fee)}`
-                  ) : (
-                    "Register Now"
-                  )}
-                </button>
-              </motion.form>
-            )}
-
-            {/* PAYMENT STEP */}
-            {step === "payment" && (
-              <motion.div
-                key="payment"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="text-center py-16"
-              >
-                <LoadingSpinner size="lg" text="Waiting for payment..." />
-                <p className="text-gray-500 text-sm mt-4">Razorpay payment window should open. Please complete the payment.</p>
-              </motion.div>
-            )}
-
-            {/* SUCCESS */}
-            {step === "success" && registrationData && (
-              <motion.div
-                key="success"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="text-center"
-              >
-                <div className="bg-gray-900/60 border border-emerald-500/20 rounded-2xl p-8 sm:p-12">
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
-                    className="w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-emerald-500/30"
-                  >
-                    <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" /></svg>
-                  </motion.div>
-
-                  <h2 className="text-2xl sm:text-3xl font-black text-white mb-2">Registration Successful! 🎉</h2>
-                  <p className="text-gray-400 mb-8">You&apos;re all set for LITUMUN 2026!</p>
-
-                  <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-xl p-6 mb-6">
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Your Registration ID</p>
-                    <p className="text-3xl font-black bg-gradient-to-r from-emerald-400 to-green-400 bg-clip-text text-transparent tracking-widest">
-                      {registrationData.registrationId}
-                    </p>
-                  </div>
-
-                  <div className="space-y-2 text-sm text-gray-400">
-                    <p><span className="text-gray-500">Event:</span> <span className="text-white">{registrationData.eventName}</span></p>
-                    <p><span className="text-gray-500">Amount:</span> <span className="text-white">{formatCurrency(registrationData.amount)}</span></p>
-                  </div>
-
-                  <p className="text-gray-500 text-xs mt-6">
-                    A confirmation email has been sent to your registered email address. Please save your Registration ID for reference.
-                  </p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <Suspense fallback={
+            <div className="text-center py-20">
+              <LoadingSpinner size="lg" text="Loading registration form..." />
+            </div>
+          }>
+            <RegistrationFormContent />
+          </Suspense>
         </div>
       </section>
     </div>

@@ -33,10 +33,10 @@ function CounterItem({ number, label }) {
       viewport={{ once: true }}
       className="text-center"
     >
-      <div className="text-4xl sm:text-5xl md:text-6xl font-black bg-gradient-to-b from-white to-gray-400 bg-clip-text text-transparent">
+      <div className="text-4xl sm:text-5xl md:text-6xl font-serif-luxury font-bold bg-gradient-to-br from-[#4e3629] via-[#b8975a] to-[#2d1f18] bg-clip-text text-transparent">
         {isStatic ? number : `${isInView ? count : 0}${suffix}`}
       </div>
-      <div className="text-gray-400 text-sm sm:text-base mt-2 font-medium uppercase tracking-wider">
+      <div className="text-[#4e3629]/90 text-xs sm:text-sm mt-2 font-poppins-clean font-bold uppercase tracking-widest">
         {label}
       </div>
     </motion.div>
